@@ -9,33 +9,34 @@ module.exports = function (src, opts) {
 function Test (src, opts) {
     if (!opts) opts = {};
     
-    this.running = false;
-    this.runner = stackedy(src);
-    
-    this.runner.on('error', function (err) {
-        console.log('caught error');
-        console.dir(err);
-    });
+    this.running = null;
+    this.runner = stackedy(src, opts);
     
     this.filename = opts.filename;
+    this.modules = opts.modules || {};
 }
 
 Test.prototype = new EventEmitter;
 
 Test.prototype.run = function (context) {
-    var assert = require('./assert')();
+    var self = this;
+    if (self.running) return self;
     
     if (!context) context = {};
-console.dir(this.runner);
+    
     context.require = function (name) {
-        if (name === 'assert') {
-            return require('./assert');
+        if (self.modules.hasOwnProperty(name)) {
+            return self.modules[name];
         }
         else {
             return require(name);
         }
     };
     
-    this.runner.run(context);
-    return this;
+    self.running = self.runner.run(context);
+    self.running.on('error', function (err) {
+        self.emit('error', err);
+    });
+    
+    return self;
 };
