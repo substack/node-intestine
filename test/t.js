@@ -6,30 +6,35 @@ exports.suite = function () {
     var suite = intestine();
     suite.define('testling', function (test) {
         return function (name, cb) {
-            console.log('name = ' + name);
             var t = tAssert();
+            t.name = name;
+            
+            t.end = function () {
+                test.end();
+            };
             
             t.on('assert', function (res) {
-                test.emit('assert', res);
+                test.emit('assert', res, name);
             });
             
             cb(t);
         }
     });
     
+    var asserts = {};
+    
     suite.on('assert', function (res, test) {
-        console.log('assert!');
-        console.dir(res.type);
+console.dir(test);
+        if (!asserts[test.name]) asserts[test.name] = []
+        asserts[test.name].push(res);
+    });
+    
+    suite.on('end', function () {
+        console.dir(asserts);
     });
     
     suite.on('error', function (err, test) {
-        console.log(err.message);
-        var ix = err.current.lines[0].match(/\S/).index;
-        console.log(
-            '  -> at line ' + err.current.start.line + '\n'
-            + '    ' + err.current.lines[0].replace(/^\s+/, '') + '\n'
-            + '    ' + Array(err.current.start.col - ix + 3).join(' ') + '^'
-        );
+        assert.fail(err.message);
     });
     
     suite.append('(' + function () {
@@ -37,6 +42,7 @@ exports.suite = function () {
         test('first', function (t) {
             t.ok(true);
             t.equal(1 + 2, 3);
+            t.end();
         });
     }.toString() + ')()', { filename : 'first.js' });
     
@@ -44,6 +50,7 @@ exports.suite = function () {
         var test = require('testling');
         test('second', function (t) {
             t.equal(1 + 2, 4);
+            t.end();
         });
     }.toString() + ')()', { filename : 'second.js' });
     

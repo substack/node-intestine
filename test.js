@@ -26,6 +26,7 @@ Test.prototype.define = function (name, cb) {
 Test.prototype.run = function (context) {
     var self = this;
     if (self.running) return self;
+    self.emit('start');
     
     if (!context) context = {};
     
@@ -44,4 +45,8 @@ Test.prototype.run = function (context) {
     });
     
     return self;
+};
+
+Test.prototype.end = function () {
+    this.emit('finish');
 };

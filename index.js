@@ -1,6 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var vm = require('vm');
 var Test = require('./test');
+var Hash = require('hashish');
 
 module.exports = function (opts) {
     return new Suite(opts);
@@ -34,8 +35,8 @@ Suite.prototype.append = function (body, opts) {
         self.emit('start', test);
     });
     
-    test.on('assert', function (res) {
-        self.emit('assert', res, test);
+    test.on('assert', function (res, name) {
+        self.emit('assert', res, Hash.merge(test, { name : name }));
     });
     
     test.on('error', function (err) {
@@ -43,9 +44,8 @@ Suite.prototype.append = function (body, opts) {
     });
     
     test.on('finish', function () {
-        self.emit('finish', test);
         self.running --;
-        
+        self.emit('finish', test);
         if (self.running === 0) self.emit('end');
     });
     
