@@ -1,0 +1,37 @@
+{
+    "name" : "intestine",
+    "version" : "0.0.0",
+    "description" : "roll your own test frameworks",
+    "main" : "index.js",
+    "directories" : {
+        "lib" : ".",
+        "example" : "example",
+        "test" : "test"
+    },
+    "dependencies" : {
+    },
+    "devDependencies" : {
+        "expresso" : "0.7.x",
+        "hashish" : ">=0.0.4 <0.1",
+        "stackedy" : ">=0.0.6 <0.1"
+    },
+    "scripts" : {
+        "test" : "expresso"
+    },
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/substack/node-intestine.git"
+    },
+    "keywords" : [
+        "test",
+        "framework",
+        "guts"
+    ],
+    "author" : {
+        "name" : "James Halliday",
+        "email" : "mail@substack.net",
+        "url" : "http://substack.net"
+    },
+    "license" : "MIT/X11",
+    "engine" : { "node" : ">=0.4" }
+}
