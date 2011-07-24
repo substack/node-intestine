@@ -18,6 +18,11 @@ function Test (src, opts) {
 
 Test.prototype = new EventEmitter;
 
+Test.prototype.define = function (name, cb) {
+    this.modules[name] = cb(this);
+    return this;
+};
+
 Test.prototype.run = function (context) {
     var self = this;
     if (self.running) return self;

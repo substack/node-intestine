@@ -1,10 +1,23 @@
+var assert = require('../assert');
+
 var intestine = require('../')
-var suite = intestine({
-    modules : {
-        testling : function (name, cb) {
-            console.log('name = ' + name);
-        }
+var suite = intestine();
+suite.define('testling', function (test) {
+    return function (name, cb) {
+        console.log('name = ' + name);
+        var t = assert();
+        
+        t.on('assert', function (res) {
+            test.emit('assert', res);
+        });
+        
+        cb(t);
     }
+});
+
+suite.on('assert', function (res, test) {
+    console.log('assert!');
+    console.dir(res.type);
 });
 
 suite.on('error', function (err, test) {

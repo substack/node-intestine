@@ -1,23 +1,32 @@
 var EventEmitter = require('events').EventEmitter;
 var vm = require('vm');
 var Test = require('./test');
-var Hash = require('hashish');
 
 module.exports = function (opts) {
     return new Suite(opts);
 };
 
 function Suite (opts) {
+    if (!opts) opts = {};
     this.tests = [];
     this.running = 0;
-    this.options = opts || {};
+    this.modules = opts.modules || {};
 }
 
 Suite.prototype = new EventEmitter;
 
+Suite.prototype.define = function (name, cb) {
+    this.modules[name] = cb;
+};
+
 Suite.prototype.append = function (body, opts) {
     var self = this;
-    var test = Test(body, Hash.merge(self.options, opts || {}));
+    var test = Test(body, opts || {});
+    
+    Object.keys(self.modules).forEach(function (name) {
+        test.define(name, self.modules[name]);
+    });
+    
     self.tests.push(test);
     
     test.on('start', function () {
