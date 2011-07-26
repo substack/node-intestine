@@ -1,7 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
 var vm = require('vm');
 var Runner = require('./runner');
-var Hash = require('hashish');
 
 module.exports = function (fn) {
     return new Suite(fn);

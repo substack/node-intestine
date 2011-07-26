@@ -9,11 +9,11 @@
         "test" : "test"
     },
     "dependencies" : {
+        "stackedy" : ">=0.0.6 <0.1",
+        "hashish" : ">=0.0.4 <0.1"
     },
     "devDependencies" : {
-        "expresso" : "0.7.x",
-        "hashish" : ">=0.0.4 <0.1",
-        "stackedy" : ">=0.0.6 <0.1"
+        "expresso" : "0.7.x"
     },
     "scripts" : {
         "test" : "expresso"
