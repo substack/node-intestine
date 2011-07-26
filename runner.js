@@ -11,7 +11,7 @@ function Runner (src, opts) {
     
     this.running = 0;
     this.handle = null;
-    this.runner = stackedy(src, opts);
+    this.runner = opts.runner || stackedy(src, opts);
     
     this.context = opts.context || {};
     this.filename = opts.filename;
