@@ -26,18 +26,24 @@ Suite.prototype.append = function (body, opts) {
         self.emit('start', test);
     });
     
-    r.on('assert', function (res, name) {
+    r.on('assert', function (res) {
         self.emit('assert', res);
     });
     
     r.on('error', function (err) {
-        self.emit('error', err, r);
+        self.emit('error', err);
+    });
+    
+    r.on('end', function () {
+        self.running --;
+        
+        process.nextTick(function () {
+            if (self.running === 0) self.emit('end');
+        });
     });
     
     r.on('finish', function (test) {
-        self.running --;
         self.emit('finish', test);
-        if (self.running === 0) self.emit('end');
     });
     
     if (self.wrapper) self.wrapper(r);

@@ -8,7 +8,7 @@ exports.suite = function () {
         runner.context.require = function (name) {
             if (name === 'testling') {
                 return function (name, cb) {
-                    var t = tAssert();
+                    var t = tAssert(name);
                     runner.start(t);
                     cb(t);
                 };

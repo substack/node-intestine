@@ -37,10 +37,10 @@ Runner.prototype.run = function (context) {
 Runner.prototype.start = function (test) {
     var self = this;
     self.running ++;
+    test.runner = self;
     
     test.on('assert', function (res) {
         res.test = test;
-        res.runner = self;
         self.emit('assert', res);
     });
     
