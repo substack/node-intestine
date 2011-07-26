@@ -49,7 +49,8 @@ Runner.prototype.start = function (test) {
         self.emit('finished', test);
         
         process.nextTick(function () {
-            if (self.running === 0) {
+            if (!self.finished && self.running === 0) {
+                self.finished = true;
                 self.emit('end');
             }
         });

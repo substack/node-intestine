@@ -22,7 +22,6 @@ Suite.prototype.append = function (body, opts) {
     self.runners.push(r);
     
     r.on('start', function (test) {
-        self.running ++;
         self.emit('start', test);
     });
     
@@ -38,7 +37,10 @@ Suite.prototype.append = function (body, opts) {
         self.running --;
         
         process.nextTick(function () {
-            if (self.running === 0) self.emit('end');
+            if (!self.finished && self.running === 0) {
+                self.finished = true;
+                self.emit('end');
+            }
         });
     });
     
@@ -52,6 +54,7 @@ Suite.prototype.append = function (body, opts) {
 };
 
 Suite.prototype.run = function (context) {
+    this.running = this.runners.length;
     this.runners.forEach(function (r) {
         return r.run(context);
     });
