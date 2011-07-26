@@ -4,29 +4,24 @@ var intestine = require('../')
 var Hash = require('hashish');
 
 exports.suite = function () {
-    var suite = intestine();
-    suite.define('testling', function (test) {
-        return function (name, cb) {
-            var t = tAssert();
-            t.name = name;
-            
-            t.end = function () {
-                test.end();
-            };
-            
-            t.on('assert', function (res) {
-                test.emit('assert', res, name);
-            });
-            
-            cb(t);
-        }
+    var suite = intestine(function (runner) {
+        runner.context.require = function (name) {
+            if (name === 'testling') {
+                return function (name, cb) {
+                    var t = tAssert();
+                    runner.start(t);
+                    cb(t);
+                };
+            }
+            else return require(name);
+        };
     });
     
     var asserts = {};
     
-    suite.on('assert', function (res, test) {
-        if (!asserts[test.name]) asserts[test.name] = []
-        asserts[test.name].push(res);
+    suite.on('assert', function (res) {
+        if (!asserts[res.test.name]) asserts[res.test.name] = []
+        asserts[res.test.name].push(res);
     });
     
     var iv = setTimeout(function () {
@@ -75,7 +70,7 @@ exports.suite = function () {
         );
     });
     
-    suite.on('error', function (err, test) {
+    suite.on('error', function (err, runner) {
         assert.fail(err.message);
     });
     

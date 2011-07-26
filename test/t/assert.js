@@ -1,10 +1,12 @@
 var EventEmitter = require('events').EventEmitter;
 
-module.exports = function () {
-    return new Assert;
+module.exports = function (name) {
+    return new Assert(name);
 };
 
-function Assert () {}
+function Assert (name) {
+    this.name = name;
+}
 
 Assert.prototype = new EventEmitter;
 
@@ -46,4 +48,8 @@ Assert.prototype.notEqual = function (x, y, name) {
         found : x,
         unwanted : y
     });
+};
+
+Assert.prototype.end = function () {
+    this.emit('end');
 };

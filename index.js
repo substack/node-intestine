@@ -1,59 +1,52 @@
 var EventEmitter = require('events').EventEmitter;
 var vm = require('vm');
-var Test = require('./test');
+var Runner = require('./runner');
 var Hash = require('hashish');
 
-module.exports = function (opts) {
-    return new Suite(opts);
+module.exports = function (fn) {
+    return new Suite(fn);
 };
 
-function Suite (opts) {
-    if (!opts) opts = {};
-    this.tests = [];
+function Suite (fn) {
+    this.runners = [];
     this.running = 0;
-    this.modules = opts.modules || {};
+    this.wrapper = fn;
 }
 
 Suite.prototype = new EventEmitter;
 
-Suite.prototype.define = function (name, cb) {
-    this.modules[name] = cb;
-};
-
 Suite.prototype.append = function (body, opts) {
     var self = this;
-    var test = Test(body, opts || {});
+    var r = Runner(body, opts || {});
     
-    Object.keys(self.modules).forEach(function (name) {
-        test.define(name, self.modules[name]);
-    });
+    self.runners.push(r);
     
-    self.tests.push(test);
-    
-    test.on('start', function () {
+    r.on('start', function (test) {
         self.running ++;
         self.emit('start', test);
     });
     
-    test.on('assert', function (res, name) {
-        self.emit('assert', res, Hash.merge(test, { name : name }));
+    r.on('assert', function (res, name) {
+        self.emit('assert', res);
     });
     
-    test.on('error', function (err) {
-        self.emit('error', err, test);
+    r.on('error', function (err) {
+        self.emit('error', err, r);
     });
     
-    test.on('finish', function () {
+    r.on('finish', function (test) {
         self.running --;
         self.emit('finish', test);
         if (self.running === 0) self.emit('end');
     });
     
+    if (self.wrapper) self.wrapper(r);
+    
     return self;
 };
 
-Suite.prototype.run = function () {
-    this.tests.forEach(function (t) {
-        return t.run();
+Suite.prototype.run = function (context) {
+    this.runners.forEach(function (r) {
+        return r.run(context);
     });
 };
